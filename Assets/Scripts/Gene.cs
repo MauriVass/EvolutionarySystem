@@ -1,6 +1,7 @@
 using System;
 using Unity;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Gene
 {
@@ -8,30 +9,24 @@ public class Gene
     //This can thought as a neuron in a neural network
     private int ID;
     private float value;
-    private List<ConnectionGene> connections;
+    private List<Gene> output;
     private Func<float, float> activationFunction;
 
     public Gene(int ID)
     {
         this.ID = ID;
         //this.activationFunction = activationFunction;
-        connections = new List<ConnectionGene>();
-    }
-    public Gene(int ID, Func<float, float> activationFunction)
-    {
-        this.ID = ID;
-        this.activationFunction = activationFunction;
-        connections = new List<ConnectionGene>();
+        output = new List<Gene>();
     }
 
-    public void AddConnection(Gene from = null, Gene to = null)
-    {
-        ConnectionGene c;
-        if (from!=null)
-            c = new ConnectionGene(from, this, 1);
-        else if(to!=null)
-            c = new ConnectionGene(this, to, 1);
-    }
+    //public void AddConnection(Gene from = null, Gene to = null)
+    //{
+    //    ConnectionGene c;
+    //    if (from!=null)
+    //        c = new ConnectionGene(from, this, 1);
+    //    else if(to!=null)
+    //        c = new ConnectionGene(this, to, 1);
+    //}
 
     public int GetID()
     {
@@ -41,5 +36,24 @@ public class Gene
     public void SetActivationFunction()
     {
         //TO DO
+    }
+
+    public float GetValue()
+    {
+        return value;
+    }
+    public void AddOutputGene(Gene gene)
+    {
+        output.Add(gene);
+    }
+
+    public void PropagateInput(float input)
+    {
+        value = activationFunction(input);
+
+        for (int i = 0; i < output.Count; i++)
+        {
+            output[i].PropagateInput(value);
+        }
     }
 }

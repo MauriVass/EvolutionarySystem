@@ -55,31 +55,44 @@ public class Population : MonoBehaviour
     public Gene GetGene(int ID)
     {
         Gene g;
-        if(!genes.TryGetValue(ID,out g))
+        genes.TryGetValue(ID, out g);
+        if(g!=null)
             return g;
         else
             return AddGene();
     }
 
-    ConnectionGene AddConnection(Gene from, Gene to, float weight)
+    public void AddConnection(Gene from, Gene to, float weight)
     {
         int index = HashFuction(from.GetID(), to.GetID());
-        ConnectionGene c = new ConnectionGene(from,to,weight);
-        connections.Add(index,c);
+        ConnectionGene c;
+        c = GetConnectionGene(from,to);
+        if (c == null)
+        {
+            print($"Added new connection ID {index} from {from.GetID()} to {to.GetID()}");
+            c = new ConnectionGene(index, from, to, weight);
+            connections.Add(index,c);
+        }
+        print($"Gotten connection ID {c.GetID()} from {from.GetID()} to {to.GetID()} with weight {c.GetWeight()}");
+        c.SetEnabled(true);
+    }
+
+
+    public ConnectionGene GetConnectionGene(Gene from, Gene to)
+    {
+        ConnectionGene c;
+        int index = HashFuction(from.GetID(), to.GetID());
+        connections.TryGetValue(index, out c);
         return c;
     }
-    public ConnectionGene GetConnectionGene(Gene from, Gene to, float weight)
+    public void RemoveConnection(ConnectionGene connection)
     {
-        ConnectionGene c = new ConnectionGene(from, to, 1);
-        int index = HashFuction(from.GetID(), to.GetID());
-        if (!connections.TryGetValue(index, out c))
-            return c;
-        else
-            return AddConnection(from,to,weight);
+        connections.Remove(connection.GetID());
+        connections = null;//not best solution, can bring to memory leaks
     }
 
     int HashFuction(int from, int to)
     {
-        return from * 100 + to;
+        return (from+1) * 100 + to;
     }
 }
